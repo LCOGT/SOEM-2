@@ -1,3 +1,29 @@
+# BUILDING THE RPM
+
+Prerequisites
+-------------
+
+  * CMake 3.26 or later
+  * Ninja
+
+```
+$ sudo yum install cmake ninja-build
+```
+
+Steps
+-----
+
+```
+$ git clone git@github.com:LCOGT/SOEM-2.git
+$ cd SOEM-2
+$ cmake --preset default
+$ cmake --build --preset default
+$ cd build/default
+$ cpack -G RPM
+```
+
+<hr>
+
 # Simple Open EtherCAT Master Library
 
 * Copyright (C) 2005-2025 Speciaal Machinefabriek Ketels v.o.f.

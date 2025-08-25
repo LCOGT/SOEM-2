@@ -2,9 +2,12 @@
 # license. See the file LICENSE.md distributed with this software for
 # full license information.
 
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.26)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 project(SOEM VERSION 2.0.0 LANGUAGES C)
+
+set(CMAKE_SYSTEM_PROCESSOR i686)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -m32")
 
 # Debug enable
 option(EC_DEBUG "Enable debug output")
@@ -127,7 +130,7 @@ install(
 
 install(
   EXPORT soemConfig
-  DESTINATION cmake
+  DESTINATION share/soem/cmake
 )
 
 install(FILES
@@ -149,18 +152,18 @@ install(FILES
 
 install(FILES
   scripts/eniconv.py
-  DESTINATION scripts
+  DESTINATION share/soem/scripts
 )
 
 install(FILES
   cmake/AddENI.cmake
-  DESTINATION cmake
+  DESTINATION share/soem/cmake
 )
 
 install(FILES
   README.md
   LICENSE.md
-  DESTINATION .
+  DESTINATION share/soem
 )
 
 if(SOEM_BUILD_SAMPLES)
@@ -184,8 +187,15 @@ endif()
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 include (InstallRequiredSystemLibraries)
+set(CPACK_GENERATOR "RPM")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE "i686")
 set (CPACK_RESOURCE_FILE_LICENSE "${SOEM_SOURCE_DIR}/LICENSE.md")
-set (CPACK_PACKAGE_CONTACT info.soem@rt-labs.com)
+set(CPACK_PACKAGE_VERSION "2.0.0")
 set (CPACK_PACKAGE_NAME soem)
+set(CPACK_PACKAGE_RELEASE 1)
+set (CPACK_PACKAGE_CONTACT mbowman@lco.global)
+set(CPACK_PACKAGE_VENDOR "Las Cumbres Observatory")
 set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR})
+set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
 include (CPack)
