@@ -57,8 +57,7 @@ set(EC_SECONDARY_MAC "04:04:04:04:04:04" CACHE STRING "Secondary MAC address")
 
 if(PROJECT_IS_TOP_LEVEL)
   # Make option visible in ccmake, cmake-gui
-  option(BUILD_SHARED_LIBS "Build shared library" OFF)
-  option(SOEM_BUILD_SAMPLES "Build samples" ON)
+  option(SOEM_BUILD_SAMPLES "Build samples" OFF)
 
   # Default to release build with debug info
   if(NOT CMAKE_BUILD_TYPE)
@@ -82,7 +81,7 @@ endif()
 set(CMAKE_C_OUTPUT_EXTENSION_REPLACE 1)
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
-add_library(soem
+add_library(soem STATIC
   src/ec_base.c
   src/ec_coe.c
   src/ec_config.c
