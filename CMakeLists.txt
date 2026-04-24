@@ -6,8 +6,14 @@ cmake_minimum_required(VERSION 3.26)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 project(SOEM VERSION 2.0.0 LANGUAGES C)
 
-set(CMAKE_SYSTEM_PROCESSOR i686)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -m32")
+include(GNUInstallDirs)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror")
+
+set(SOEM_RPM_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+if(SOEM_RPM_ARCH STREQUAL "amd64")
+  set(SOEM_RPM_ARCH "x86_64")
+endif()
 
 # Debug enable
 option(EC_DEBUG "Enable debug output")
@@ -51,8 +57,7 @@ set(EC_SECONDARY_MAC "04:04:04:04:04:04" CACHE STRING "Secondary MAC address")
 
 if(PROJECT_IS_TOP_LEVEL)
   # Make option visible in ccmake, cmake-gui
-  option(BUILD_SHARED_LIBS "Build shared library" OFF)
-  option(SOEM_BUILD_SAMPLES "Build samples" ON)
+  option(SOEM_BUILD_SAMPLES "Build samples" OFF)
 
   # Default to release build with debug info
   if(NOT CMAKE_BUILD_TYPE)
@@ -76,7 +81,7 @@ endif()
 set(CMAKE_C_OUTPUT_EXTENSION_REPLACE 1)
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
-add_library(soem
+add_library(soem STATIC
   src/ec_base.c
   src/ec_coe.c
   src/ec_config.c
@@ -125,7 +130,7 @@ configure_file(
 install(
   TARGETS soem
   EXPORT soemConfig
-  DESTINATION lib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(
@@ -188,14 +193,16 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 include (InstallRequiredSystemLibraries)
 set(CPACK_GENERATOR "RPM")
-set(CPACK_RPM_PACKAGE_ARCHITECTURE "i686")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE "${SOEM_RPM_ARCH}")
 set (CPACK_RESOURCE_FILE_LICENSE "${SOEM_SOURCE_DIR}/LICENSE.md")
 set(CPACK_PACKAGE_VERSION "2.0.0")
 set (CPACK_PACKAGE_NAME soem)
 set(CPACK_PACKAGE_RELEASE 1)
+set(CPACK_RPM_PACKAGE_RELEASE_DIST ON)
+set(CPACK_RPM_PACKAGE_DIST "el9")
 set (CPACK_PACKAGE_CONTACT mbowman@lco.global)
 set(CPACK_PACKAGE_VENDOR "Las Cumbres Observatory")
-set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR})
+set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}-${SOEM_RPM_ARCH})
 set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.el9.${SOEM_RPM_ARCH}")
 include (CPack)
